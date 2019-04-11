@@ -467,10 +467,9 @@
 			 * @description abstract class for UI objects
 			 */
 			class _UI {
-				constructor(htmlid, cssClass) {
-					cssClass = cssClass || "";
+				constructor(htmlid) {
 					this.htmlid = htmlid || guid();
-					this.cssClass = 'form-control' + cssClass;
+					this.cssClass = 'form-control';
 				}
 				getValue() {
 					var a = jQuery('#' + this.htmlid).val();
@@ -525,8 +524,8 @@
 			 * @description simple select html control class
 			 */
 			class _Input extends _UI {
-				constructor(id, label, value, type, hid, readonly, cssCls) {
-					super(hid, cssCls);
+				constructor(id, label, value, type, hid, readonly) {
+					super(hid);
 					this.readonly = !!readonly ? 'readonly' : '';
 
 					this.label = label || "";
@@ -601,7 +600,7 @@
 
 					this.template = `
                         <div id='${this.htmlid}'>
-                            <div style='width:100%;background:#fff' class='${this.divSubClass}'>
+                            <div style='width:100%' class='${this.divSubClass}'>
                             <h5>${ this.subLables.room + " " + (parseInt(roomID) + 1)}</h5>
                                 <div class='row form-group'>
                                     <div class='col-md-6'>
@@ -630,34 +629,6 @@
 					return result
 				}
 				afterRender() {
-					const childAgeMax = this.childAgeMax;
-
-						                    jQuery(document).on('keyup', '.pb-child-field', function(ev){
-							                      const _elem = this;
-							                       let val = $(_elem).val();
-								                        if(val > childAgeMax){
-															$(_elem).val(childAgeMax)
-								                        };
-
-								                       if( val < 1 ){
-								                            $(_elem).val(1)
-								                        };
-
-								                    })
-
-					                    jQuery(document).on('change', '.pb-child-field', function(ev){
-						                        const _elem = this;
-						                        let val = $(_elem).val();
-
-							                        if(val > childAgeMax){
-							                            $(_elem).val(childAgeMax)
-							                        };
-
-							                        if( val < 1 ){
-							                            $(_elem).val(1)
-							                        };
-
-							                    })
 					jQuery('#' + this.controls['childs'].htmlid).on('change', (e) => {
 						let template = ``;
 						const label = '';
@@ -667,9 +638,7 @@
 						for (let i = 0; i < roomModel.childs; i += 1) {
 							let value = !!roomModel.ages[i] ? roomModel.ages[i] : this.childAgeMax;
 
-							//let inp = new _Input(idPrefix + i + '-' + this.roomID, this.subLables.ages + "#" + (i + 1), value, type, 'sub-child-age_' + i + '_' + this.roomID);
-							let inp = new _Input(idPrefix + i + '-' + this.roomID, this.subLables.ages, value, type, 'sub-child-age_' + i + '_' + this.roomID, false,'pb-child-field');
-
+							let inp = new _Input(idPrefix + i + '-' + this.roomID, this.subLables.ages + "#" + (i + 1), value, type, 'sub-child-age_' + i + '_' + this.roomID);
 							this.childAgesElements.push(inp)
 
 							template += `<div class='col-md-6 form-group'> ${inp.template} </div>`
@@ -716,7 +685,7 @@
 					this.template = `
                         <div class='pb-person'>
                             <label>${this.label}</label>
-                          <div class="${this.subData.inputClass}" id="${this.htmlid}" readonly style="background:#fff">
+                            <div class="${this.subData.inputClass}" id="${this.htmlid}" readonly>
                                 <span class="pb-form-icon icon-room">
                                 <svg fill="#ccc" viewBox="0 0 37 70">
                                 <path d="M36.7 18.2C36.7 8.2 28.6 0 18.5 0S.3 8.2.3 18.2c0 7.8 5 14.5 11.9 17.1v4.5l4.5 3.8-4.5 3.8v.2l4.5 3.8-4.5 3.8v.2l4.5 3.8-4.5 3.8 6.3 7 6.3-6.7v-28c6.9-2.5 11.9-9.2 11.9-17.1zM15.9 7.8c1.4-1.4 3.7-1.4 5.2 0 1.4 1.4 1.4 3.7 0 5.2-1.4 1.4-3.7 1.4-5.2 0-1.4-1.4-1.4-3.8 0-5.2z"/>
@@ -1003,6 +972,7 @@
 		/**
 		 * Config for Communicator
 		 */
+		
 	//TODO
 
 		/**
@@ -1033,7 +1003,7 @@
                 </div>        
             </div>
             
-            <div id="dialog" title="  " style="display:none;">
+            <div id="dialog" title="Basic dialog" style="display:none;">
             
             </div>
             `,
@@ -1076,7 +1046,7 @@
 			value: false,
 			subHid: 'pb-persons-sub',
 			maxAdults: 5,
-			maxChilds: 1,
+			maxChilds: 10,
 			childAgeMax: 5,
 			maxRooms: 3,
 			inputClass: 'form-control',
@@ -1111,21 +1081,14 @@
 			var dWidth = wWidth * CONF_VIEW.coefficient;
 			var dHeight = wHeight * CONF_VIEW.coefficient;
 
-			$( window ).resize(function() {
-				$( "#dialog" ).dialog( "option", "position", $( "#dialog" ).dialog( "option", "position" ) );
-				$( "#dialog" ).dialog( "option", "width", dWidth );
-				$( "#dialog" ).dialog( "option", "height", dHeight );
-			});
-			// window.addEventListener("resize",  function(){
-			//     if(!withoutDialog){
-			//         var wWidth = $(window).width();
-			//         var wHeight = $(window).height();
-			//         var dWidth = wWidth * CONF_VIEW.coefficient;
-			//         var dHeight = wHeight * CONF_VIEW.coefficient;
+			if (!withoutDialog) {
+				$(window).resize(function () {
+					$("#dialog").dialog("option", "position", $("#dialog").dialog("option", "position"));
+					$("#dialog").dialog("option", "width", dWidth);
+					$("#dialog").dialog("option", "height", dHeight);
+				});
+			}
 
-			//         $('.pb-dialog').css('width', dWidth).css('height', dHeight);
-			//     }
-			// });
 
 			const data = json.data;
 			const lng = json.r_lang //set default language for app from hotel
@@ -1166,7 +1129,7 @@
 				};
 
 
-			}else{
+			} else {
 				globalColors['search_panel_bg'] = CONF_VIEW.colors['search_panel_bg'];
 				globalColors['button_top_color'] = CONF_VIEW.colors['button_top_color'];
 				globalColors['button_bottom_color'] = CONF_VIEW.colors['button_bottom_color'];
@@ -1194,10 +1157,18 @@
 
 					return retValue
 				},
+				"hotels": (data) => {
+					let retValue = {};
 
+					data.forEach((elem, inx) => {
+						retValue[elem.id] = elem.name + ' ' + elem.city;
+					});
+
+					return retValue
+				},
 			};
 
-			let lang = lng;
+			let lang = lng; //set default language. NOTE: Not constant!
 
 			selectsElemsIds.forEach((el) => {
 				CONF_VIEW.controls[el] = {
@@ -1236,12 +1207,10 @@
 			CONF_VIEW.controls["persons"].subLables.addRoom = data.agenda.label_addroom_link;
 			CONF_VIEW.controls["persons"].subLables.room = data.agenda.label_room_title;
 			CONF_VIEW.controls["persons"].subLables.removeRoom = data.agenda.label_remove_last;
-			CONF_VIEW.controls["persons"].maxChilds = parseInt(data.child_max);
-			CONF_VIEW.controls["persons"].maxAdults = parseInt(data.adults_max);
 			CONF_VIEW.controls["persons"].subLables.short = {
-				c:data.agenda.label_c_field,
-				a:data.agenda.label_a_field,
-				r:data.agenda.label_r_field
+				c: data.agenda.label_c_field,
+				a: data.agenda.label_a_field,
+				r: data.agenda.label_r_field
 			};
 
 			const Container = API.view.Container(CONF_VIEW);
@@ -1266,15 +1235,14 @@
 				//Set selected language
 				langs.val(lng);
 
-
-				$('#pb-r-cont').css('background-color', "#" + globalColors.search_panel_bg).css('color','#' + globalColors.header_with_menu_font_color);
+				$('#pb-r-cont').css('background-color', "#" + globalColors.search_panel_bg).css('color', '#' + globalColors.header_with_menu_font_color);
 				dfrom.css('border-color', "#" + globalColors.input_border_color);
 				dtill.css('border-color', "#" + globalColors.input_border_color);
 				persons.css('border-color', "#" + globalColors.input_border_color);
 				langs.css('border-color', "#" + globalColors.input_border_color);
 				currencies.css('border-color', "#" + globalColors.input_border_color);
 				hotels.css('border-color', "#" + globalColors.input_border_color);
-				searchButton.css('background-image', 'linear-gradient(#'+ globalColors.button_top_color +',#'+globalColors.button_bottom_color);
+				searchButton.css('background-image', 'linear-gradient(#' + globalColors.button_top_color + ',#' + globalColors.button_bottom_color);
 				promoinp.css('border-color', "#" + globalColors.input_border_color);
 
 				searchButton.on('click', (e) => {
@@ -1311,11 +1279,8 @@
 						})
 					});
 
-					//let src = CONF_COMM.frameProtocol + '://' + sub_domain + '.' + CONF_COMM.frameRoot + '/' + lang + '/'  + url;
-					if (lang == 'uk') {
-						lang = 'ua';
-					}
-					let src = CONF_COMM.frameProtocol + '://'  + sub_domain + '.' + CONF_COMM.frameRoot + '/' + lang + '/'  + CONF_COMM.frameParam +  url;
+					let src = CONF_COMM.frameProtocol + '://' + CONF_COMM.frameRoot + url;
+
 					if (!withoutDialog) {
 
 						// pb-dialog
@@ -1332,7 +1297,10 @@
 								collision: 'fit',
 								resizable: false,
 								draggable: false,
-								overlay: { opacity: 0.1, background: "black" },
+								overlay: {
+									opacity: 0.1,
+									background: "black"
+								},
 								width: dWidth,
 								height: dHeight,
 								dialogClass: 'pb-dialog'
@@ -1342,9 +1310,7 @@
 						});
 						Communicator.run('search', values);
 					} else {
-
-						//window.open(CONF_COMM.frameProtocol + '://' + sub_domain + '.' + CONF_COMM.frameRoot + url)
-						window.open(CONF_COMM.frameProtocol + '://'  + sub_domain + '.' + CONF_COMM.frameRoot + '/' + lang + '/'  + CONF_COMM.frameParam +  url);
+						window.open(CONF_COMM.frameProtocol + '://' + sub_domain + '.' + CONF_COMM.frameRoot + url)
 					}
 				});
 
@@ -1366,11 +1332,11 @@
 					numberOfMonths: 2,
 					dateFormat: dateFormat,
 					minDate: 0,
-					beforeShow: function() {
+					beforeShow: function () {
 						$('#ui-datepicker-div').addClass('pb-c');
 					}
 				}).on("change", function () {
-					//to.datepicker("option", "minDate", getDate(this));
+
 					to.datepicker("option", "minDate", addDay(getDate(this)));
 				});
 
@@ -1380,7 +1346,7 @@
 					numberOfMonths: 2,
 					dateFormat: dateFormat,
 					minDate: 0,
-					beforeShow: function() {
+					beforeShow: function () {
 						$('#ui-datepicker-div').addClass('pb-c');
 					}
 				}).on("change", function () {
@@ -1419,9 +1385,10 @@
 				}
 
 				function addDay(date) {
-				   var tomorrow = new Date(date);
-					   tomorrow.setDate(tomorrow.getDate() + 1);
-					   return tomorrow;
+					var tomorrow = new Date(date);
+					tomorrow.setDate(tomorrow.getDate() + 1);
+
+					return tomorrow;
 				}
 
 			});
