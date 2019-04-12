@@ -1189,7 +1189,7 @@ return datepicker.regional[ "zh-CN" ];
         
                     return retValue
                 },
-                "hotels": (data) => {
+                /*"hotels": (data) => {
                     if (!data) return;
                     let retValue = {};
         
@@ -1198,7 +1198,7 @@ return datepicker.regional[ "zh-CN" ];
                     });
         
                     return retValue
-                },
+                },*/
             };
         
             let lang = lng; //set default language. NOTE: Not constant!
