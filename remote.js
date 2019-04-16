@@ -1314,7 +1314,8 @@ return datepicker.regional[ "zh-CN" ];
                         })
                     });
         
-                    let src = CONF_COMM.frameProtocol + '://' + CONF_COMM.frameRoot + url;
+            	let src = CONF_COMM.frameProtocol + '://' + CONF_COMM.frameRoot  + '/' + CONF_COMM.frameParam + '/' + url;
+
         
                     if (!withoutDialog) {
         
@@ -1345,8 +1346,8 @@ return datepicker.regional[ "zh-CN" ];
                         });
                         Communicator.run('search', values);
                     } else {
-                        window.open(CONF_COMM.frameProtocol + '://' + sub_domain + '.' + CONF_COMM.frameRoot + url)
-                    }
+			window.open(CONF_COMM.frameProtocol + '://' + sub_domain + '.' + CONF_COMM.frameRoot + '/' + CONF_COMM.frameParam + '/'  + url)
+		    }
                 });
         
                 persons.on('click', (e) => {
